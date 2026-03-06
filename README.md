@@ -8,11 +8,11 @@ Sample repository demonstrating Armis security scanning.
 | Severity | Count |
 |----------|-------|
 | Critical | 0 |
-| High | 0 |
+| High | 3 |
 | Medium | 0 |
-| Low | 0 |
+| Low | 1 |
 
-*Last scan: Never*
+*Last scan: 2026-03-06 21:14 UTC*
 <!-- SECURITY-SUMMARY-END -->
 
 View detailed findings in the [Security tab](../../security/code-scanning).
