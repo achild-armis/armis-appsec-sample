@@ -15,7 +15,7 @@ on:
         type: string
 
 permissions:
-  contents: read
+  contents: write
   security-events: write
 
 jobs:
@@ -54,3 +54,43 @@ jobs:
         with:
           sarif_file: armis-results.sarif
           category: armis-security
+
+      - name: Update README with scan summary
+        if: always() && steps.check-sarif.outputs.valid == 'true' && github.ref == 'refs/heads/main'
+        run: |
+          # Parse SARIF for vulnerability counts
+          CRITICAL=$(jq '[.runs[].results[] | select(.level == "error" and (.properties.severity == "critical" or .properties.severity == "CRITICAL"))] | length' armis-results.sarif 2>/dev/null || echo "0")
+          HIGH=$(jq '[.runs[].results[] | select(.level == "error" and (.properties.severity == "high" or .properties.severity == "HIGH"))] | length' armis-results.sarif 2>/dev/null || echo "0")
+          MEDIUM=$(jq '[.runs[].results[] | select(.level == "warning")] | length' armis-results.sarif 2>/dev/null || echo "0")
+          LOW=$(jq '[.runs[].results[] | select(.level == "note")] | length' armis-results.sarif 2>/dev/null || echo "0")
+
+          # Get total if severity-based counts are all 0
+          if [ "$CRITICAL" = "0" ] && [ "$HIGH" = "0" ] && [ "$MEDIUM" = "0" ] && [ "$LOW" = "0" ]; then
+            TOTAL=$(jq '[.runs[].results[]] | length' armis-results.sarif 2>/dev/null || echo "0")
+            HIGH=$TOTAL
+          fi
+
+          SCAN_DATE=$(date -u '+%Y-%m-%d %H:%M UTC')
+
+          # Update README
+          sed -i.bak '/<!-- SECURITY-SUMMARY-START -->/,/<!-- SECURITY-SUMMARY-END -->/c\
+          <!-- SECURITY-SUMMARY-START -->\
+          | Severity | Count |\
+          |----------|-------|\
+          | Critical | '"$CRITICAL"' |\
+          | High | '"$HIGH"' |\
+          | Medium | '"$MEDIUM"' |\
+          | Low | '"$LOW"' |\
+          \
+          *Last scan: '"$SCAN_DATE"'*\
+          <!-- SECURITY-SUMMARY-END -->' README.md
+          rm -f README.md.bak
+
+      - name: Commit README update
+        if: always() && steps.check-sarif.outputs.valid == 'true' && github.ref == 'refs/heads/main'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add README.md
+          git diff --staged --quiet || git commit -m "Update security scan summary [skip ci]"
+          git push || echo "Nothing to push"
