@@ -37,9 +37,20 @@ jobs:
           fail-on: HIGH
           output-file: armis-results.sarif
 
+      - name: Check SARIF file
+        id: check-sarif
+        if: always()
+        run: |
+          if [ -s armis-results.sarif ] && jq empty armis-results.sarif 2>/dev/null; then
+            echo "valid=true" >> $GITHUB_OUTPUT
+          else
+            echo "valid=false" >> $GITHUB_OUTPUT
+            echo "SARIF file is empty or invalid, skipping upload"
+          fi
+
       - name: Upload SARIF to GitHub Security
         uses: github/codeql-action/upload-sarif@v3
-        if: always()
+        if: always() && steps.check-sarif.outputs.valid == 'true'
         with:
           sarif_file: armis-results.sarif
           category: armis-security
