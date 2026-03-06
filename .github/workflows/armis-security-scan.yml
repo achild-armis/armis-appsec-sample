@@ -14,6 +14,10 @@ on:
         required: false
         type: string
 
+permissions:
+  contents: read
+  security-events: write
+
 jobs:
   security-scan:
     runs-on: ubuntu-latest
@@ -24,9 +28,18 @@ jobs:
           ref: ${{ inputs.branch || github.ref }}
 
       - name: Run Armis CLI scan
+        id: armis-scan
         uses: ArmisSecurity/armis-cli@main
         with:
           scan-type: repo
           api-token: ${{ secrets.ARMIS_API_TOKEN }}
           tenant-id: ${{ secrets.ARMIS_TENANT_ID }}
-          fail-on: CRITICAL
+          fail-on: HIGH
+          output-file: armis-results.sarif
+
+      - name: Upload SARIF to GitHub Security
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: armis-results.sarif
+          category: armis-security
