@@ -1,6 +1,8 @@
 name: Armis Security Scan
 
 on:
+  schedule:
+    - cron: '0 6 * * *'  # Daily at 6 AM UTC
   push:
     branches: [main]
   pull_request:
