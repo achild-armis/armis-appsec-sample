@@ -29,8 +29,11 @@ jobs:
 
       - name: Install Armis CLI
         run: |
-          curl -fsSL https://github.com/ArmisSecurity/armis-cli/releases/latest/download/armis-cli-linux-amd64.tar.gz | tar -xz
-          sudo mv armis-cli /usr/local/bin/
+          # Extract to temp directory to avoid overwriting repo files
+          TMP_DIR=$(mktemp -d)
+          curl -fsSL https://github.com/ArmisSecurity/armis-cli/releases/latest/download/armis-cli-linux-amd64.tar.gz | tar -xz -C "$TMP_DIR"
+          sudo mv "$TMP_DIR/armis-cli" /usr/local/bin/
+          rm -rf "$TMP_DIR"
           armis-cli --version
 
       - name: Run Armis CLI scan with SBOM and VEX
