@@ -2,7 +2,7 @@ name: Armis Security Scan
 
 on:
   schedule:
-    - cron: '0 6 * * *'  # Daily at 6 AM UTC
+    - cron: '0 6 * * *'
   push:
     branches: [main]
   pull_request:
@@ -20,29 +20,30 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Install Armis CLI
-        run: |
-          curl -sSL https://raw.githubusercontent.com/ArmisSecurity/armis-cli/main/scripts/install.sh | bash
-          echo "$HOME/.local/bin" >> $GITHUB_PATH
-
       - name: Run Armis CLI scan
         id: armis-scan
+        uses: ArmisSecurity/armis-cli@main
+        with:
+          scan-type: repo
+          api-token: ${{ secrets.ARMIS_API_TOKEN }}
+          tenant-id: ${{ secrets.ARMIS_TENANT_ID }}
+          fail-on: HIGH
+          output-file: armis-results.sarif
+
+      - name: Generate SBOM and VEX
+        if: always()
         env:
           ARMIS_API_TOKEN: ${{ secrets.ARMIS_API_TOKEN }}
         run: |
-          set +e
+          # CLI was installed by the action to ~/.local/bin
           ~/.local/bin/armis-cli scan repo . \
             --tenant-id "${{ secrets.ARMIS_TENANT_ID }}" \
             --format sarif \
-            --fail-on HIGH \
             --sbom \
             --vex \
             --sbom-output sbom.cdx.json \
             --vex-output vex.cdx.json \
-            > armis-results.sarif
-          SCAN_EXIT_CODE=$?
-          echo "exit-code=$SCAN_EXIT_CODE" >> $GITHUB_OUTPUT
-          exit $SCAN_EXIT_CODE
+            > /dev/null 2>&1 || true
 
       - name: Check SARIF file
         id: check-sarif
@@ -52,7 +53,6 @@ jobs:
             echo "valid=true" >> $GITHUB_OUTPUT
           else
             echo "valid=false" >> $GITHUB_OUTPUT
-            echo "SARIF file is empty or invalid, skipping upload"
           fi
 
       - name: Upload SARIF to GitHub Security
@@ -79,17 +79,17 @@ jobs:
           if-no-files-found: ignore
 
       - name: Save artifacts to repo
-        if: always() && steps.check-sarif.outputs.valid == 'true' && github.ref == 'refs/heads/main'
+        if: always() && github.ref == 'refs/heads/main'
         run: |
           mkdir -p .security
           [ -f sbom.cdx.json ] && cp sbom.cdx.json .security/
           [ -f vex.cdx.json ] && cp vex.cdx.json .security/
 
       - name: Commit artifacts
-        if: always() && steps.check-sarif.outputs.valid == 'true' && github.ref == 'refs/heads/main'
+        if: always() && github.ref == 'refs/heads/main'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add .security/
           git diff --staged --quiet || git commit -m "Update SBOM and VEX [skip ci]"
-          git push || echo "Nothing to push"
+          git push || true
