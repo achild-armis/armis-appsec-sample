@@ -8,11 +8,6 @@ on:
   pull_request:
     branches: [main]
   workflow_dispatch:
-    inputs:
-      branch:
-        description: "Branch to scan (leave empty to use current ref)"
-        required: false
-        type: string
 
 permissions:
   contents: write
@@ -24,22 +19,19 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          ref: ${{ inputs.branch || github.ref }}
 
       - name: Install Armis CLI
         run: |
-          curl -fsSL https://github.com/ArmisSecurity/armis-cli/releases/latest/download/armis-cli-linux-amd64.tar.gz | tar -xz
-          sudo mv armis-cli /usr/local/bin/
-          armis-cli --version
+          curl -sSL https://raw.githubusercontent.com/ArmisSecurity/armis-cli/main/scripts/install.sh | bash
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
 
-      - name: Run Armis CLI scan with SBOM and VEX
+      - name: Run Armis CLI scan
         id: armis-scan
         env:
           ARMIS_API_TOKEN: ${{ secrets.ARMIS_API_TOKEN }}
         run: |
           set +e
-          armis-cli scan repo . \
+          ~/.local/bin/armis-cli scan repo . \
             --tenant-id "${{ secrets.ARMIS_TENANT_ID }}" \
             --format sarif \
             --fail-on HIGH \
@@ -86,58 +78,18 @@ jobs:
           path: vex.cdx.json
           if-no-files-found: ignore
 
-      - name: Upload scan results artifact
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: scan-results
-          path: armis-results.sarif
-          if-no-files-found: ignore
-
-      - name: Update README with scan summary
-        if: always() && steps.check-sarif.outputs.valid == 'true' && github.ref == 'refs/heads/main'
-        run: |
-          # Parse SARIF for vulnerability counts
-          CRITICAL=$(jq '[.runs[].results[] | select(.level == "error" and (.properties.severity == "critical" or .properties.severity == "CRITICAL"))] | length' armis-results.sarif 2>/dev/null || echo "0")
-          HIGH=$(jq '[.runs[].results[] | select(.level == "error" and (.properties.severity == "high" or .properties.severity == "HIGH"))] | length' armis-results.sarif 2>/dev/null || echo "0")
-          MEDIUM=$(jq '[.runs[].results[] | select(.level == "warning")] | length' armis-results.sarif 2>/dev/null || echo "0")
-          LOW=$(jq '[.runs[].results[] | select(.level == "note")] | length' armis-results.sarif 2>/dev/null || echo "0")
-
-          # Get total if severity-based counts are all 0
-          if [ "$CRITICAL" = "0" ] && [ "$HIGH" = "0" ] && [ "$MEDIUM" = "0" ] && [ "$LOW" = "0" ]; then
-            TOTAL=$(jq '[.runs[].results[]] | length' armis-results.sarif 2>/dev/null || echo "0")
-            HIGH=$TOTAL
-          fi
-
-          SCAN_DATE=$(date -u '+%Y-%m-%d %H:%M UTC')
-
-          # Update README
-          sed -i.bak '/<!-- SECURITY-SUMMARY-START -->/,/<!-- SECURITY-SUMMARY-END -->/c\
-          <!-- SECURITY-SUMMARY-START -->\
-          | Severity | Count |\
-          |----------|-------|\
-          | Critical | '"$CRITICAL"' |\
-          | High | '"$HIGH"' |\
-          | Medium | '"$MEDIUM"' |\
-          | Low | '"$LOW"' |\
-          \
-          *Last scan: '"$SCAN_DATE"'*\
-          <!-- SECURITY-SUMMARY-END -->' README.md
-          rm -f README.md.bak
-
-      - name: Save security artifacts to repo
+      - name: Save artifacts to repo
         if: always() && steps.check-sarif.outputs.valid == 'true' && github.ref == 'refs/heads/main'
         run: |
           mkdir -p .security
           [ -f sbom.cdx.json ] && cp sbom.cdx.json .security/
           [ -f vex.cdx.json ] && cp vex.cdx.json .security/
-          [ -f armis-results.sarif ] && cp armis-results.sarif .security/scan-results.sarif
 
-      - name: Commit security artifacts and README
+      - name: Commit artifacts
         if: always() && steps.check-sarif.outputs.valid == 'true' && github.ref == 'refs/heads/main'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add README.md .security/
-          git diff --staged --quiet || git commit -m "Update security scan results [skip ci]"
+          git add .security/
+          git diff --staged --quiet || git commit -m "Update SBOM and VEX [skip ci]"
           git push || echo "Nothing to push"
