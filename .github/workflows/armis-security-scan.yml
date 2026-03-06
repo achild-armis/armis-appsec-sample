@@ -27,15 +27,30 @@ jobs:
         with:
           ref: ${{ inputs.branch || github.ref }}
 
-      - name: Run Armis CLI scan
+      - name: Install Armis CLI
+        run: |
+          curl -fsSL https://github.com/ArmisSecurity/armis-cli/releases/latest/download/armis-cli-linux-amd64.tar.gz | tar -xz
+          sudo mv armis-cli /usr/local/bin/
+          armis-cli --version
+
+      - name: Run Armis CLI scan with SBOM and VEX
         id: armis-scan
-        uses: ArmisSecurity/armis-cli@main
-        with:
-          scan-type: repo
-          api-token: ${{ secrets.ARMIS_API_TOKEN }}
-          tenant-id: ${{ secrets.ARMIS_TENANT_ID }}
-          fail-on: HIGH
-          output-file: armis-results.sarif
+        env:
+          ARMIS_API_TOKEN: ${{ secrets.ARMIS_API_TOKEN }}
+        run: |
+          set +e
+          armis-cli scan repo . \
+            --tenant-id "${{ secrets.ARMIS_TENANT_ID }}" \
+            --format sarif \
+            --fail-on HIGH \
+            --sbom \
+            --vex \
+            --sbom-output sbom.cdx.json \
+            --vex-output vex.cdx.json \
+            > armis-results.sarif
+          SCAN_EXIT_CODE=$?
+          echo "exit-code=$SCAN_EXIT_CODE" >> $GITHUB_OUTPUT
+          exit $SCAN_EXIT_CODE
 
       - name: Check SARIF file
         id: check-sarif
@@ -54,6 +69,30 @@ jobs:
         with:
           sarif_file: armis-results.sarif
           category: armis-security
+
+      - name: Upload SBOM artifact
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: sbom
+          path: sbom.cdx.json
+          if-no-files-found: ignore
+
+      - name: Upload VEX artifact
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: vex
+          path: vex.cdx.json
+          if-no-files-found: ignore
+
+      - name: Upload scan results artifact
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: scan-results
+          path: armis-results.sarif
+          if-no-files-found: ignore
 
       - name: Update README with scan summary
         if: always() && steps.check-sarif.outputs.valid == 'true' && github.ref == 'refs/heads/main'
@@ -86,11 +125,19 @@ jobs:
           <!-- SECURITY-SUMMARY-END -->' README.md
           rm -f README.md.bak
 
-      - name: Commit README update
+      - name: Save security artifacts to repo
+        if: always() && steps.check-sarif.outputs.valid == 'true' && github.ref == 'refs/heads/main'
+        run: |
+          mkdir -p .security
+          [ -f sbom.cdx.json ] && cp sbom.cdx.json .security/
+          [ -f vex.cdx.json ] && cp vex.cdx.json .security/
+          [ -f armis-results.sarif ] && cp armis-results.sarif .security/scan-results.sarif
+
+      - name: Commit security artifacts and README
         if: always() && steps.check-sarif.outputs.valid == 'true' && github.ref == 'refs/heads/main'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add README.md
-          git diff --staged --quiet || git commit -m "Update security scan summary [skip ci]"
+          git add README.md .security/
+          git diff --staged --quiet || git commit -m "Update security scan results [skip ci]"
           git push || echo "Nothing to push"
