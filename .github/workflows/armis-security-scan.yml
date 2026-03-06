@@ -1,0 +1,32 @@
+name: Armis Security Scan
+
+on:
+  schedule:
+    - cron: '0 6 * * *'  # Daily at 6 AM UTC
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: "Branch to scan (leave empty to use current ref)"
+        required: false
+        type: string
+
+jobs:
+  security-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.branch || github.ref }}
+
+      - name: Run Armis CLI scan
+        uses: ArmisSecurity/armis-cli@main
+        with:
+          scan-type: repo
+          api-token: ${{ secrets.ARMIS_API_TOKEN }}
+          tenant-id: ${{ secrets.ARMIS_TENANT_ID }}
+          fail-on: CRITICAL
