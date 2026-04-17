@@ -1,0 +1,8 @@
+Add multi-language vulnerable sample pack for AppSec demos
+
+- add Perl command injection example
+- add Java path traversal example
+- add COBOL hardcoded secret exposure example
+- add Raku XSS example
+- add Nim SQL injection example
+- add findings manifest and README snippet

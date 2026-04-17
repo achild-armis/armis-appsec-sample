@@ -1,0 +1,19 @@
+- file: samples/perl/sample-vuln.pl
+  language: Perl
+  classification: command_injection
+
+- file: samples/java/SamplePathTraversal.java
+  language: Java
+  classification: path_traversal
+
+- file: samples/cobol/sample_vuln.cob
+  language: COBOL
+  classification: hardcoded_secret_exposure
+
+- file: samples/raku/sample_vuln.raku
+  language: Raku
+  classification: xss
+
+- file: samples/nim/sample_vuln.nim
+  language: Nim
+  classification: sql_injection
