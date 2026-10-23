@@ -2,14 +2,14 @@
   "$schema": "http://cyclonedx.org/schema/bom-1.6.schema.json",
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
-  "serialNumber": "urn:uuid:0b8f7626-ec68-48d9-a5bc-77378288d70b",
+  "serialNumber": "urn:uuid:81aa83b6-6e55-4068-b523-f85f25443e45",
   "version": 1,
   "metadata": {
-    "timestamp": "2026-10-22T11:37:50+00:00",
+    "timestamp": "2026-10-23T11:27:05+00:00",
     "component": {
-      "bom-ref": "d263f8cd-308d-4af6-ae36-fd77118d6afd",
+      "bom-ref": "ab61ccc8-cfce-4a85-8c4c-9966c357abee",
       "type": "application",
-      "name": "/tmp/scan_6ad9f57b51626f53ef6e5813_filtered",
+      "name": "/tmp/scan_6adb447a66fb7644ebbcb744_filtered",
       "properties": [
         {
           "name": "SchemaVersion",
@@ -20,7 +20,7 @@
   },
   "components": [
     {
-      "bom-ref": "812ab542-755c-4bb3-abbd-986194f2b74f",
+      "bom-ref": "d5a72b5b-78fb-45e3-94c8-ff1b87c6e338",
       "type": "application",
       "name": "requirements.txt",
       "properties": [
@@ -180,7 +180,13 @@
   ],
   "dependencies": [
     {
-      "ref": "812ab542-755c-4bb3-abbd-986194f2b74f",
+      "ref": "ab61ccc8-cfce-4a85-8c4c-9966c357abee",
+      "dependsOn": [
+        "d5a72b5b-78fb-45e3-94c8-ff1b87c6e338"
+      ]
+    },
+    {
+      "ref": "d5a72b5b-78fb-45e3-94c8-ff1b87c6e338",
       "dependsOn": [
         "pkg:pypi/anyio@4.15.1",
         "pkg:pypi/asyncpg@0.29.0",
@@ -191,12 +197,6 @@
         "pkg:pypi/idna@3.20",
         "pkg:pypi/sniffio@1.3.1",
         "pkg:pypi/typing-extensions@4.16.0"
-      ]
-    },
-    {
-      "ref": "d263f8cd-308d-4af6-ae36-fd77118d6afd",
-      "dependsOn": [
-        "812ab542-755c-4bb3-abbd-986194f2b74f"
       ]
     },
     {
@@ -228,11 +228,11 @@
     {
       "ref": "pkg:pypi/httpx@0.27.0",
       "dependsOn": [
-        "pkg:pypi/idna@3.20",
+        "pkg:pypi/certifi@2026.10.19",
+        "pkg:pypi/anyio@4.15.1",
         "pkg:pypi/httpcore@1.0.9",
         "pkg:pypi/sniffio@1.3.1",
-        "pkg:pypi/certifi@2026.10.19",
-        "pkg:pypi/anyio@4.15.1"
+        "pkg:pypi/idna@3.20"
       ]
     },
     {
