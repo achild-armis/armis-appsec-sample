@@ -2,14 +2,14 @@
   "$schema": "http://cyclonedx.org/schema/bom-1.6.schema.json",
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
-  "serialNumber": "urn:uuid:b82541cd-dabf-4994-8deb-4d38f1bd0e43",
+  "serialNumber": "urn:uuid:f0d39d8b-8f4c-4a68-9ab2-ad82e4d46456",
   "version": 1,
   "metadata": {
-    "timestamp": "2026-10-27T12:00:38+00:00",
+    "timestamp": "2026-10-28T12:37:20+00:00",
     "component": {
-      "bom-ref": "d40db066-43ab-4797-87db-c2f8caa3ae52",
+      "bom-ref": "0ce03cba-087c-4b57-bc95-c9b951c5430d",
       "type": "application",
-      "name": "/tmp/scan_6ae092508102fee2eae0ee26_filtered",
+      "name": "/tmp/scan_6ae1ec76bd8d50e5052d0730_filtered",
       "properties": [
         {
           "name": "SchemaVersion",
@@ -20,7 +20,7 @@
   },
   "components": [
     {
-      "bom-ref": "42608d3b-4960-4e90-9f2c-52d7ee369ddc",
+      "bom-ref": "8a547b36-eefd-4dc9-9c22-662d52151385",
       "type": "application",
       "name": "requirements.txt",
       "properties": [
@@ -180,7 +180,13 @@
   ],
   "dependencies": [
     {
-      "ref": "42608d3b-4960-4e90-9f2c-52d7ee369ddc",
+      "ref": "0ce03cba-087c-4b57-bc95-c9b951c5430d",
+      "dependsOn": [
+        "8a547b36-eefd-4dc9-9c22-662d52151385"
+      ]
+    },
+    {
+      "ref": "8a547b36-eefd-4dc9-9c22-662d52151385",
       "dependsOn": [
         "pkg:pypi/anyio@4.15.1",
         "pkg:pypi/asyncpg@0.29.0",
@@ -194,16 +200,10 @@
       ]
     },
     {
-      "ref": "d40db066-43ab-4797-87db-c2f8caa3ae52",
-      "dependsOn": [
-        "42608d3b-4960-4e90-9f2c-52d7ee369ddc"
-      ]
-    },
-    {
       "ref": "pkg:pypi/anyio@4.15.1",
       "dependsOn": [
-        "pkg:pypi/typing-extensions@4.16.0",
-        "pkg:pypi/idna@3.20"
+        "pkg:pypi/idna@3.20",
+        "pkg:pypi/typing-extensions@4.16.0"
       ]
     },
     {
@@ -228,10 +228,10 @@
     {
       "ref": "pkg:pypi/httpx@0.27.0",
       "dependsOn": [
-        "pkg:pypi/sniffio@1.3.1",
-        "pkg:pypi/certifi@2026.10.23",
         "pkg:pypi/idna@3.20",
         "pkg:pypi/anyio@4.15.1",
+        "pkg:pypi/sniffio@1.3.1",
+        "pkg:pypi/certifi@2026.10.23",
         "pkg:pypi/httpcore@1.0.9"
       ]
     },
