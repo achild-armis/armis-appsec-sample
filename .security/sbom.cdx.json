@@ -2,14 +2,14 @@
   "$schema": "http://cyclonedx.org/schema/bom-1.6.schema.json",
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
-  "serialNumber": "urn:uuid:79d06f7c-a30d-4e65-b579-324b4a78a00e",
+  "serialNumber": "urn:uuid:843c7c14-395a-41dc-bc89-a4b3235dadc9",
   "version": 1,
   "metadata": {
-    "timestamp": "2026-11-07T12:52:04+00:00",
+    "timestamp": "2026-11-08T13:09:51+00:00",
     "component": {
-      "bom-ref": "293bfa5c-c3f0-4b64-a62d-6c17f84b089e",
+      "bom-ref": "70117692-e43e-4d2f-91f2-85d42d9384eb",
       "type": "application",
-      "name": "/tmp/scan_6aef1ee97f02eeaa3f996a1a_filtered",
+      "name": "/tmp/scan_6af074944edf807f334d6e3f_filtered",
       "properties": [
         {
           "name": "SchemaVersion",
@@ -20,7 +20,7 @@
   },
   "components": [
     {
-      "bom-ref": "84941f3e-dd0d-4373-b0d0-f834c6f8a81a",
+      "bom-ref": "e35bf9ca-5e94-4188-bcf4-1502fbac7ca6",
       "type": "application",
       "name": "requirements.txt",
       "properties": [
@@ -63,13 +63,13 @@
   ],
   "dependencies": [
     {
-      "ref": "293bfa5c-c3f0-4b64-a62d-6c17f84b089e",
+      "ref": "70117692-e43e-4d2f-91f2-85d42d9384eb",
       "dependsOn": [
-        "84941f3e-dd0d-4373-b0d0-f834c6f8a81a"
+        "e35bf9ca-5e94-4188-bcf4-1502fbac7ca6"
       ]
     },
     {
-      "ref": "84941f3e-dd0d-4373-b0d0-f834c6f8a81a",
+      "ref": "e35bf9ca-5e94-4188-bcf4-1502fbac7ca6",
       "dependsOn": [
         "pkg:pypi/asyncpg@0.29.0",
         "pkg:pypi/httpx@0.27.0"
