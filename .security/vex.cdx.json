@@ -1,8 +1,8 @@
 {
   "@context": "https://openvex.dev/ns/v0.2.0",
-  "@id": "https://openvex.dev/docs/vex-7e34cfa9-27b8-4733-9721-96e723de5414",
+  "@id": "https://openvex.dev/docs/vex-d398f766-87b6-4beb-993d-6e8bd4d3e473",
   "author": "Armis AppSec",
-  "timestamp": "2026-11-12T15:08:34.452087+00:00",
+  "timestamp": "2026-11-13T14:33:22.108439+00:00",
   "version": 1,
   "statements": []
 }
