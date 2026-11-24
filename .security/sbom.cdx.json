@@ -2,14 +2,14 @@
   "$schema": "http://cyclonedx.org/schema/bom-1.6.schema.json",
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
-  "serialNumber": "urn:uuid:450e7106-729b-4763-9f05-f0fbcab633a4",
+  "serialNumber": "urn:uuid:0b85fe1a-2ea8-4449-9114-18b458e9f685",
   "version": 1,
   "metadata": {
-    "timestamp": "2026-11-23T17:54:31+00:00",
+    "timestamp": "2026-11-24T17:27:42+00:00",
     "component": {
-      "bom-ref": "9121e650-096f-4195-8225-a4495d643f0a",
+      "bom-ref": "c661647a-86b9-4ca6-a3fc-a29db211742b",
       "type": "application",
-      "name": "/tmp/scan_6b047dc7e9003aeadf04d6d6_filtered",
+      "name": "/tmp/scan_6b05c8fea7aea5a337aaaae6_filtered",
       "properties": [
         {
           "name": "SchemaVersion",
@@ -20,7 +20,7 @@
   },
   "components": [
     {
-      "bom-ref": "d1e51e82-f590-42b0-b79b-9f0f07b16d3c",
+      "bom-ref": "30b21f1a-b63b-4e33-ac16-882c56c759e7",
       "type": "application",
       "name": "requirements.txt",
       "properties": [
@@ -180,13 +180,7 @@
   ],
   "dependencies": [
     {
-      "ref": "9121e650-096f-4195-8225-a4495d643f0a",
-      "dependsOn": [
-        "d1e51e82-f590-42b0-b79b-9f0f07b16d3c"
-      ]
-    },
-    {
-      "ref": "d1e51e82-f590-42b0-b79b-9f0f07b16d3c",
+      "ref": "30b21f1a-b63b-4e33-ac16-882c56c759e7",
       "dependsOn": [
         "pkg:pypi/anyio@4.16.0",
         "pkg:pypi/asyncpg@0.29.0",
@@ -197,6 +191,12 @@
         "pkg:pypi/idna@3.20",
         "pkg:pypi/sniffio@1.3.1",
         "pkg:pypi/typing-extensions@4.16.0"
+      ]
+    },
+    {
+      "ref": "c661647a-86b9-4ca6-a3fc-a29db211742b",
+      "dependsOn": [
+        "30b21f1a-b63b-4e33-ac16-882c56c759e7"
       ]
     },
     {
@@ -228,10 +228,10 @@
     {
       "ref": "pkg:pypi/httpx@0.27.0",
       "dependsOn": [
-        "pkg:pypi/sniffio@1.3.1",
-        "pkg:pypi/httpcore@1.0.9",
         "pkg:pypi/idna@3.20",
+        "pkg:pypi/sniffio@1.3.1",
         "pkg:pypi/anyio@4.16.0",
+        "pkg:pypi/httpcore@1.0.9",
         "pkg:pypi/certifi@2026.11.20"
       ]
     },
